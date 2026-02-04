@@ -304,7 +304,7 @@ def checkout_page():
         SELECT c.quantity, p.price
         FROM cart c
         JOIN products p ON c.product_id = p.id
-        WHERE c.session_id = ?
+        WHERE c.session_id = %s
     ''', (session_id,))
     items = cursor.fetchall()
 
@@ -321,7 +321,7 @@ def checkout_page():
         if 'user_id' in session:
             cursor.execute('''
                 SELECT id FROM orders
-                WHERE user_id = ? AND promo_code = ?
+                WHERE user_id = %s AND promo_code = %s
             ''', (session['user_id'], token_received))
             already_used = cursor.fetchone()
             if already_used:
@@ -389,7 +389,7 @@ def get_product(product_id):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute('SELECT * FROM products WHERE id = ?', (product_id,))
+    cursor.execute('SELECT * FROM products WHERE id = %s', (product_id,))
     row = cursor.fetchone()
 
     if not row:
@@ -398,7 +398,7 @@ def get_product(product_id):
 
     product = dict(row)
 
-    cursor.execute('SELECT ingredient_name FROM ingredients WHERE product_id = ?', (product_id,))
+    cursor.execute('SELECT ingredient_name FROM ingredients WHERE product_id = %s', (product_id,))
     ingredients = [row['ingredient_name'] for row in cursor.fetchall()]
     product['ingredients'] = ingredients
 
@@ -422,7 +422,7 @@ def get_cart():
             SELECT c.id, c.quantity, c.product_id, c.weight, c.price_override, p.*
             FROM cart c
             JOIN products p ON c.product_id = p.id
-            WHERE c.user_id = ?
+            WHERE c.user_id = %s
         ''', (session['user_id'],))
     else:
         # Guest cart using session_id
@@ -431,7 +431,7 @@ def get_cart():
             SELECT c.id, c.quantity, c.product_id, c.weight, c.price_override, p.*
             FROM cart c
             JOIN products p ON c.product_id = p.id
-            WHERE c.session_id = ? AND c.user_id IS NULL
+            WHERE c.session_id = %s AND c.user_id IS NULL
         ''', (session_id,))
 
     cart_items = []
@@ -460,7 +460,7 @@ def add_to_cart():
     conn = sqlite3.connect(DATABASE['path'])
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM products WHERE id = ?', (product_id,))
+    cursor.execute('SELECT * FROM products WHERE id = %s', (product_id,))
     product = cursor.fetchone()
 
     if not product:
@@ -498,14 +498,14 @@ def add_to_cart():
     if 'user_id' in session:
         # Logged-in user: use user_id
         cursor.execute(
-            'SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ? AND weight = ?',
+            'SELECT id, quantity FROM cart WHERE user_id = %s AND product_id = %s AND weight = %s',
             (session['user_id'], product_id, weight)
         )
         existing = cursor.fetchone()
 
         if existing:
             new_quantity = existing[1] + quantity
-            cursor.execute('UPDATE cart SET quantity = ? WHERE id = ?', (new_quantity, existing[0]))
+            cursor.execute('UPDATE cart SET quantity = %s WHERE id = %s', (new_quantity, existing[0]))
         else:
             cursor.execute(
                 'INSERT INTO cart (user_id, product_id, quantity, weight, price_override) VALUES (?, ?, ?, ?, ?)',
@@ -515,14 +515,14 @@ def add_to_cart():
         # Guest: use session_id
         session_id = get_session_id()
         cursor.execute(
-            'SELECT id, quantity FROM cart WHERE session_id = ? AND user_id IS NULL AND product_id = ? AND weight = ?',
+            'SELECT id, quantity FROM cart WHERE session_id = %s AND user_id IS NULL AND product_id = %s AND weight = %s',
             (session_id, product_id, weight)
         )
         existing = cursor.fetchone()
 
         if existing:
             new_quantity = existing[1] + quantity
-            cursor.execute('UPDATE cart SET quantity = ? WHERE id = ?', (new_quantity, existing[0]))
+            cursor.execute('UPDATE cart SET quantity = %s WHERE id = %s', (new_quantity, existing[0]))
         else:
             cursor.execute(
                 'INSERT INTO cart (session_id, product_id, quantity, weight, price_override) VALUES (?, ?, ?, ?, ?)',
@@ -549,13 +549,13 @@ def update_cart_quantity():
     # Check if user is logged in or guest
     if 'user_id' in session:
         cursor.execute(
-            'SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ? AND weight = ?',
+            'SELECT id, quantity FROM cart WHERE user_id = %s AND product_id = %s AND weight = %s',
             (session['user_id'], product_id, weight)
         )
     else:
         session_id = get_session_id()
         cursor.execute(
-            'SELECT id, quantity FROM cart WHERE session_id = ? AND user_id IS NULL AND product_id = ? AND weight = ?',
+            'SELECT id, quantity FROM cart WHERE session_id = %s AND user_id IS NULL AND product_id = %s AND weight = %s',
             (session_id, product_id, weight)
         )
 
@@ -567,9 +567,9 @@ def update_cart_quantity():
         new_qty = current_qty + 1 if action == 'increase' else current_qty - 1
 
         if new_qty <= 0:
-            cursor.execute('DELETE FROM cart WHERE id = ?', (cart_id,))
+            cursor.execute('DELETE FROM cart WHERE id = %s', (cart_id,))
         else:
-            cursor.execute('UPDATE cart SET quantity = ? WHERE id = ?', (new_qty, cart_id))
+            cursor.execute('UPDATE cart SET quantity = %s WHERE id = %s', (new_qty, cart_id))
 
     conn.commit()
     conn.close()
@@ -588,13 +588,13 @@ def remove_from_cart():
     # Check if user is logged in or guest
     if 'user_id' in session:
         cursor.execute(
-            'DELETE FROM cart WHERE user_id = ? AND product_id = ? AND weight = ?',
+            'DELETE FROM cart WHERE user_id = %s AND product_id = %s AND weight = %s',
             (session['user_id'], product_id, weight)
         )
     else:
         session_id = get_session_id()
         cursor.execute(
-            'DELETE FROM cart WHERE session_id = ? AND user_id IS NULL AND product_id = ? AND weight = ?',
+            'DELETE FROM cart WHERE session_id = %s AND user_id IS NULL AND product_id = %s AND weight = %s',
             (session_id, product_id, weight)
         )
 
@@ -623,7 +623,7 @@ def validate_promo_code():
         cursor = conn.cursor()
         cursor.execute('''
             SELECT id FROM orders
-            WHERE user_id = ? AND promo_code = ?
+            WHERE user_id = %s AND promo_code = %s
         ''', (session['user_id'], promo_code))
         already_used = cursor.fetchone()
         conn.close()
@@ -677,7 +677,7 @@ def signup():
     cursor = conn.cursor()
 
     # Check if email already exists
-    cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+    cursor.execute('SELECT id FROM users WHERE email = %s', (email,))
     if cursor.fetchone():
         conn.close()
         return jsonify({'success': False, 'error': 'Email already registered'}), 400
@@ -720,7 +720,7 @@ def login():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
+    cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
     user = cursor.fetchone()
     conn.close()
 
@@ -782,7 +782,7 @@ def forgot_password():
     cursor = conn.cursor()
 
     # Find user by email
-    cursor.execute('SELECT id, name FROM users WHERE email = ?', (email,))
+    cursor.execute('SELECT id, name FROM users WHERE email = %s', (email,))
     user = cursor.fetchone()
 
     if not user:
@@ -798,7 +798,7 @@ def forgot_password():
     expires_at = datetime.now() + timedelta(hours=1)  # Token valid for 1 hour
 
     # Invalidate any existing tokens for this user
-    cursor.execute('UPDATE password_reset_tokens SET used = 1 WHERE user_id = ?', (user['id'],))
+    cursor.execute('UPDATE password_reset_tokens SET used = 1 WHERE user_id = %s', (user['id'],))
 
     # Create new token
     cursor.execute('''
@@ -873,7 +873,7 @@ def reset_password():
     cursor.execute('''
         SELECT t.*, u.email, u.name FROM password_reset_tokens t
         JOIN users u ON t.user_id = u.id
-        WHERE t.token = ? AND t.used = 0 AND t.expires_at > datetime('now')
+        WHERE t.token = %s AND t.used = 0 AND t.expires_at > datetime('now')
     ''', (token,))
     token_row = cursor.fetchone()
 
@@ -883,10 +883,10 @@ def reset_password():
 
     # Update password
     password_hash = generate_password_hash(new_password)
-    cursor.execute('UPDATE users SET password_hash = ? WHERE id = ?', (password_hash, token_row['user_id']))
+    cursor.execute('UPDATE users SET password_hash = %s WHERE id = %s', (password_hash, token_row['user_id']))
 
     # Mark token as used
-    cursor.execute('UPDATE password_reset_tokens SET used = 1 WHERE id = ?', (token_row['id'],))
+    cursor.execute('UPDATE password_reset_tokens SET used = 1 WHERE id = %s', (token_row['id'],))
 
     conn.commit()
     conn.close()
@@ -910,7 +910,7 @@ def get_addresses():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        'SELECT * FROM addresses WHERE user_id = ? ORDER BY is_default DESC, created_at DESC',
+        'SELECT * FROM addresses WHERE user_id = %s ORDER BY is_default DESC, created_at DESC',
         (session['user_id'],)
     )
     addresses = [dict(row) for row in cursor.fetchall()]
@@ -938,10 +938,10 @@ def add_address():
     # If this is the first address or marked as default, update others
     is_default = data.get('is_default', False)
     if is_default:
-        cursor.execute('UPDATE addresses SET is_default = 0 WHERE user_id = ?', (session['user_id'],))
+        cursor.execute('UPDATE addresses SET is_default = 0 WHERE user_id = %s', (session['user_id'],))
 
     # Check if this is user's first address (make it default)
-    cursor.execute('SELECT COUNT(*) FROM addresses WHERE user_id = ?', (session['user_id'],))
+    cursor.execute('SELECT COUNT(*) FROM addresses WHERE user_id = %s', (session['user_id'],))
     if cursor.fetchone()[0] == 0:
         is_default = True
 
@@ -980,20 +980,20 @@ def update_address(address_id):
     cursor = conn.cursor()
 
     # Verify address belongs to user
-    cursor.execute('SELECT id FROM addresses WHERE id = ? AND user_id = ?', (address_id, session['user_id']))
+    cursor.execute('SELECT id FROM addresses WHERE id = %s AND user_id = %s', (address_id, session['user_id']))
     if not cursor.fetchone():
         conn.close()
         return jsonify({'success': False, 'error': 'Address not found'}), 404
 
     # If setting as default, unset others
     if data.get('is_default'):
-        cursor.execute('UPDATE addresses SET is_default = 0 WHERE user_id = ?', (session['user_id'],))
+        cursor.execute('UPDATE addresses SET is_default = 0 WHERE user_id = %s', (session['user_id'],))
 
     cursor.execute('''
         UPDATE addresses SET
-            label = ?, full_name = ?, phone = ?, address_line1 = ?,
-            address_line2 = ?, city = ?, state = ?, pincode = ?, is_default = ?
-        WHERE id = ? AND user_id = ?
+            label = %s, full_name = %s, phone = %s, address_line1 = %s,
+            address_line2 = %s, city = %s, state = %s, pincode = %s, is_default = %s
+        WHERE id = %s AND user_id = %s
     ''', (
         data.get('label', 'Home'),
         data.get('full_name', ''),
@@ -1024,7 +1024,7 @@ def delete_address(address_id):
     cursor = conn.cursor()
 
     # Verify address belongs to user
-    cursor.execute('SELECT is_default FROM addresses WHERE id = ? AND user_id = ?', (address_id, session['user_id']))
+    cursor.execute('SELECT is_default FROM addresses WHERE id = %s AND user_id = %s', (address_id, session['user_id']))
     row = cursor.fetchone()
     if not row:
         conn.close()
@@ -1032,12 +1032,12 @@ def delete_address(address_id):
 
     was_default = row[0]
 
-    cursor.execute('DELETE FROM addresses WHERE id = ? AND user_id = ?', (address_id, session['user_id']))
+    cursor.execute('DELETE FROM addresses WHERE id = %s AND user_id = %s', (address_id, session['user_id']))
 
     # If deleted address was default, make another one default
     if was_default:
         cursor.execute(
-            'UPDATE addresses SET is_default = 1 WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+            'UPDATE addresses SET is_default = 1 WHERE user_id = %s ORDER BY created_at DESC LIMIT 1',
             (session['user_id'],)
         )
 
@@ -1057,14 +1057,14 @@ def set_default_address(address_id):
     cursor = conn.cursor()
 
     # Verify address belongs to user
-    cursor.execute('SELECT id FROM addresses WHERE id = ? AND user_id = ?', (address_id, session['user_id']))
+    cursor.execute('SELECT id FROM addresses WHERE id = %s AND user_id = %s', (address_id, session['user_id']))
     if not cursor.fetchone():
         conn.close()
         return jsonify({'success': False, 'error': 'Address not found'}), 404
 
     # Unset all defaults, then set this one
-    cursor.execute('UPDATE addresses SET is_default = 0 WHERE user_id = ?', (session['user_id'],))
-    cursor.execute('UPDATE addresses SET is_default = 1 WHERE id = ?', (address_id,))
+    cursor.execute('UPDATE addresses SET is_default = 0 WHERE user_id = %s', (session['user_id'],))
+    cursor.execute('UPDATE addresses SET is_default = 1 WHERE id = %s', (address_id,))
 
     conn.commit()
     conn.close()
@@ -1103,7 +1103,7 @@ def create_order():
     cursor = conn.cursor()
 
     # Verify address belongs to user
-    cursor.execute('SELECT * FROM addresses WHERE id = ? AND user_id = ?', (address_id, session['user_id']))
+    cursor.execute('SELECT * FROM addresses WHERE id = %s AND user_id = %s', (address_id, session['user_id']))
     address = cursor.fetchone()
     if not address:
         conn.close()
@@ -1114,7 +1114,7 @@ def create_order():
         SELECT c.*, p.name, p.subtitle, p.price as product_price
         FROM cart c
         JOIN products p ON c.product_id = p.id
-        WHERE c.user_id = ?
+        WHERE c.user_id = %s
     ''', (session['user_id'],))
     cart_items = cursor.fetchall()
 
@@ -1132,7 +1132,7 @@ def create_order():
         # Check if user has already used this promo code
         cursor.execute('''
             SELECT id FROM orders
-            WHERE user_id = ? AND promo_code = ?
+            WHERE user_id = %s AND promo_code = %s
         ''', (session['user_id'], promo_code))
         already_used = cursor.fetchone()
 
@@ -1171,7 +1171,7 @@ def create_order():
         ''', (order_id, item['product_id'], item['name'], item['subtitle'], item['weight'], item['quantity'], price))
 
     # Clear cart
-    cursor.execute('DELETE FROM cart WHERE user_id = ?', (session['user_id'],))
+    cursor.execute('DELETE FROM cart WHERE user_id = %s', (session['user_id'],))
 
     conn.commit()
     conn.close()
@@ -1202,14 +1202,14 @@ def get_user_orders():
         SELECT o.*, a.full_name as address_name, a.city, a.pincode
         FROM orders o
         LEFT JOIN addresses a ON o.address_id = a.id
-        WHERE o.user_id = ?
+        WHERE o.user_id = %s
         ORDER BY o.created_at DESC
     ''', (session['user_id'],))
     orders = [dict(row) for row in cursor.fetchall()]
 
     # Get items for each order
     for order in orders:
-        cursor.execute('SELECT * FROM order_items WHERE order_id = ?', (order['id'],))
+        cursor.execute('SELECT * FROM order_items WHERE order_id = %s', (order['id'],))
         order['items'] = [dict(row) for row in cursor.fetchall()]
 
     conn.close()
@@ -1230,7 +1230,7 @@ def get_order_details(order_id):
         SELECT o.*, a.*
         FROM orders o
         LEFT JOIN addresses a ON o.address_id = a.id
-        WHERE o.id = ? AND o.user_id = ?
+        WHERE o.id = %s AND o.user_id = %s
     ''', (order_id, session['user_id']))
     order = cursor.fetchone()
 
@@ -1240,7 +1240,7 @@ def get_order_details(order_id):
 
     order_dict = dict(order)
 
-    cursor.execute('SELECT * FROM order_items WHERE order_id = ?', (order_id,))
+    cursor.execute('SELECT * FROM order_items WHERE order_id = %s', (order_id,))
     order_dict['items'] = [dict(row) for row in cursor.fetchall()]
 
     conn.close()
@@ -1265,7 +1265,7 @@ def create_payment():
     cursor = conn.cursor()
 
     # Get order
-    cursor.execute('SELECT * FROM orders WHERE id = ? AND user_id = ?', (order_id, session['user_id']))
+    cursor.execute('SELECT * FROM orders WHERE id = %s AND user_id = %s', (order_id, session['user_id']))
     order = cursor.fetchone()
 
     if not order:
@@ -1297,7 +1297,7 @@ def create_payment():
 
         # Update order with razorpay order id
         cursor.execute(
-            'UPDATE orders SET razorpay_order_id = ? WHERE id = ?',
+            'UPDATE orders SET razorpay_order_id = %s WHERE id = %s',
             (razorpay_order['id'], order_id)
         )
         conn.commit()
@@ -1334,7 +1334,7 @@ def verify_payment():
     cursor = conn.cursor()
 
     # Get order
-    cursor.execute('SELECT * FROM orders WHERE id = ? AND user_id = ?', (order_id, session['user_id']))
+    cursor.execute('SELECT * FROM orders WHERE id = %s AND user_id = %s', (order_id, session['user_id']))
     order = cursor.fetchone()
 
     if not order:
@@ -1344,8 +1344,8 @@ def verify_payment():
     if test_mode or not RAZORPAY_ENABLED:
         # Test mode - mark as paid without verification
         cursor.execute('''
-            UPDATE orders SET payment_status = 'paid', payment_id = ?, order_status = 'confirmed', updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
+            UPDATE orders SET payment_status = 'paid', payment_id = %s, order_status = 'confirmed', updated_at = CURRENT_TIMESTAMP
+            WHERE id = %s
         ''', (f'TEST_{order_id}', order_id))
         conn.commit()
         conn.close()
@@ -1369,8 +1369,8 @@ def verify_payment():
 
         # Update order
         cursor.execute('''
-            UPDATE orders SET payment_status = 'paid', payment_id = ?, order_status = 'confirmed', updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
+            UPDATE orders SET payment_status = 'paid', payment_id = %s, order_status = 'confirmed', updated_at = CURRENT_TIMESTAMP
+            WHERE id = %s
         ''', (razorpay_payment_id, order_id))
         conn.commit()
         conn.close()
@@ -1570,7 +1570,7 @@ def update_order_status(order_id):
     cursor = conn.cursor()
 
     cursor.execute(
-        'UPDATE orders SET order_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        'UPDATE orders SET order_status = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s',
         (new_status, order_id)
     )
 
