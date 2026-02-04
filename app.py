@@ -698,7 +698,7 @@ def signup():
     # Create user
     password_hash = generate_password_hash(password)
     cursor.execute(
-        'INSERT INTO users (name, email, phone, password_hash) VALUES (?, ?, ?, ?)',
+        'INSERT INTO users (name, email, phone, password_hash) VALUES (%s, %s, %s, %s)',
         (name, email, phone, password_hash)
     )
     user_id = cursor.lastrowid
@@ -816,7 +816,7 @@ def forgot_password():
     # Create new token
     cursor.execute('''
         INSERT INTO password_reset_tokens (user_id, token, expires_at)
-        VALUES (?, ?, ?)
+        VALUES (%s, %s, %s)
     ''', (user['id'], token, expires_at))
 
     conn.commit()
@@ -960,7 +960,7 @@ def add_address():
 
     cursor.execute('''
         INSERT INTO addresses (user_id, label, full_name, phone, address_line1, address_line2, city, state, pincode, is_default)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     ''', (
         session['user_id'],
         data.get('label', 'Home'),
@@ -1170,7 +1170,7 @@ def create_order():
     order_number = generate_order_number()
     cursor.execute('''
         INSERT INTO orders (order_number, user_id, address_id, subtotal, discount, delivery_fee, total_amount, promo_code)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     ''', (order_number, session['user_id'], address_id, subtotal, discount, delivery_fee, total_amount, promo_code or None))
 
     order_id = cursor.lastrowid
@@ -1180,7 +1180,7 @@ def create_order():
         price = item['price_override'] or item['product_price']
         cursor.execute('''
             INSERT INTO order_items (order_id, product_id, product_name, product_subtitle, weight, quantity, price)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (order_id, item['product_id'], item['name'], item['subtitle'], item['weight'], item['quantity'], price))
 
     # Clear cart
@@ -1456,7 +1456,7 @@ def contact_form():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO contact_messages (name, email, subject, message) VALUES (?, ?, ?, ?)',
+        'INSERT INTO contact_messages (name, email, subject, message) VALUES (%s, %s, %s, %s)',
         (name, email, subject, message)
     )
     conn.commit()
