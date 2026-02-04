@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Masala Box - Real Spices. Real Masalas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <div class="logo-circle">
+                            <span>MB</span>
+                        </div>
+                        <div class="logo-text">
+                            <h1>The Masala Box</h1>
+                            <p class="tagline">Real Spices. Real Masalas</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="nav" id="nav">
+                    <a href="#signature-blends" class="nav-link">Signature Blends</a>
+                    <a href="#single-origins" class="nav-link">Single Origins</a>
+                    <a href="#about" class="nav-link">About Us</a>
+                </nav>
+                
+                <div class="header-actions">
+                    <div class="currency-selector">
+                        <select id="currency-select" aria-label="Select Currency">
+                            <option value="IN" selected>INR</option>
+                            <option value="US">USD</option>
+                            <option value="GB">GBP</option>
+                        </select>
+                    </div>
+                    <!-- Auth Button -->
+                    <button class="icon-btn auth-btn" id="auth-btn" aria-label="Account">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="6" r="4" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 18C3 14.134 6.134 11 10 11C13.866 11 17 14.134 17 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span class="auth-user-name" id="auth-user-name" style="display: none;"></span>
+                    </button>
+                    <button class="icon-btn search-btn" aria-label="Search">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="2"/>
+                            <path d="M14 14L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn cart-btn" id="cart-btn" aria-label="Cart">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M3 3H5L5.4 5M5.4 5L7 13H17L19 5H5.4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="8" cy="17" r="1" fill="currentColor"/>
+                            <circle cx="16" cy="17" r="1" fill="currentColor"/>
+                        </svg>
+                        <span class="cart-badge" id="cart-badge">0</span>
+                    </button>
+                    <button class="hamburger" id="hamburger" aria-label="Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-illustration">
+                    <svg class="spice-bowl" viewBox="0 0 400 350" fill="none">
+                        <!-- Wooden Bowl -->
+                        <ellipse cx="200" cy="280" rx="160" ry="40" fill="#3d2e1f" opacity="0.3"/>
+                        <path d="M40 180 L40 260 Q40 300 80 310 L320 310 Q360 300 360 260 L360 180 Q360 150 330 140 L70 140 Q40 150 40 180 Z"
+                              fill="#5a4433" stroke="#d4a853" stroke-width="2"/>
+                        <path d="M50 180 L50 250 Q50 280 85 290 L315 290 Q350 280 350 250 L350 180"
+                              fill="#4a3828" stroke="none"/>
+                        <ellipse cx="200" cy="180" rx="150" ry="35" fill="#3d2e1f" stroke="#d4a853" stroke-width="2"/>
+                        <ellipse cx="200" cy="180" rx="130" ry="28" fill="#2d2216"/>
+
+                        <!-- Spices in Bowl -->
+                        <g class="spices-in-bowl">
+                            <!-- Turmeric pile -->
+                            <ellipse cx="150" cy="175" rx="35" ry="15" fill="#DAA520" opacity="0.9"/>
+                            <ellipse cx="150" cy="170" rx="25" ry="10" fill="#FFD700" opacity="0.8"/>
+
+                            <!-- Red chili pile -->
+                            <ellipse cx="240" cy="178" rx="30" ry="12" fill="#B22222" opacity="0.9"/>
+                            <ellipse cx="245" cy="173" rx="20" ry="8" fill="#DC143C" opacity="0.8"/>
+
+                            <!-- Coriander seeds -->
+                            <ellipse cx="190" cy="185" rx="25" ry="10" fill="#8B7355" opacity="0.9"/>
+
+                            <!-- Green cardamom -->
+                            <circle cx="280" cy="175" r="8" fill="#228B22" opacity="0.8"/>
+                            <circle cx="290" cy="180" r="6" fill="#2E8B57" opacity="0.7"/>
+                            <circle cx="275" cy="182" r="5" fill="#228B22" opacity="0.6"/>
+
+                            <!-- Cinnamon sticks -->
+                            <rect x="120" y="165" width="25" height="6" rx="3" fill="#8B4513" transform="rotate(-15 120 165)"/>
+                            <rect x="125" y="175" width="20" height="5" rx="2" fill="#A0522D" transform="rotate(10 125 175)"/>
+                        </g>
+
+                        <!-- Floating spices around bowl -->
+                        <g class="spice-float spice-1">
+                            <circle cx="60" cy="100" r="10" fill="#DAA520" opacity="0.7"/>
+                            <circle cx="65" cy="95" r="5" fill="#FFD700" opacity="0.9"/>
+                        </g>
+                        <g class="spice-float spice-2">
+                            <ellipse cx="340" cy="120" rx="8" ry="12" fill="#228B22" opacity="0.7"/>
+                        </g>
+                        <g class="spice-float spice-3">
+                            <circle cx="80" cy="250" r="6" fill="#DC143C" opacity="0.6"/>
+                        </g>
+                        <g class="spice-float spice-4">
+                            <rect x="320" cy="220" width="15" height="4" rx="2" fill="#8B4513" opacity="0.7" transform="rotate(25 320 220)"/>
+                        </g>
+
+                        <!-- Decorative stars/sparkles -->
+                        <g class="sparkle sparkle-1">
+                            <path d="M100 60 L102 66 L108 68 L102 70 L100 76 L98 70 L92 68 L98 66 Z" fill="#d4a853" opacity="0.6"/>
+                        </g>
+                        <g class="sparkle sparkle-2">
+                            <path d="M300 50 L301 54 L305 55 L301 56 L300 60 L299 56 L295 55 L299 54 Z" fill="#d4a853" opacity="0.5"/>
+                        </g>
+                        <g class="sparkle sparkle-3">
+                            <path d="M350 160 L351 163 L354 164 L351 165 L350 168 L349 165 L346 164 L349 163 Z" fill="#d4a853" opacity="0.4"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signature Blends Section -->
+    <section class="section signature-blends" id="signature-blends">
+        <div class="container">
+            <h2 class="section-title">Signature Blends</h2>
+            <div class="products-grid" id="signature-products">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Single Origin Section -->
+    <section class="section single-origins" id="single-origins">
+        <div class="container">
+            <h2 class="section-title">Single Origin</h2>
+            <div class="products-grid single-origin-grid" id="single-origin-products">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="section about-section" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image">
+                    <svg class="about-illustration" viewBox="0 0 400 500" fill="none">
+                        <!-- Decorative mortar illustration -->
+                        <circle cx="200" cy="250" r="120" fill="#d4a853" opacity="0.1"/>
+                        <path d="M100 220 L100 350 Q100 380 130 390 L270 390 Q300 380 300 350 L300 220 Q300 200 280 190 L120 190 Q100 200 100 220 Z" 
+                              fill="#242424" stroke="#d4a853" stroke-width="3"/>
+                        <ellipse cx="200" cy="220" rx="100" ry="30" fill="#1a1a1a" stroke="#d4a853" stroke-width="3"/>
+                        
+                        <!-- Decorative spices -->
+                        <g opacity="0.6">
+                            <circle cx="150" cy="280" r="12" fill="#d4a853"/>
+                            <circle cx="250" cy="300" r="10" fill="#c49a3c"/>
+                            <path d="M200 320 L206 326 L200 332 L194 326 Z" fill="#d4a853"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="about-text">
+                    <span class="about-label">Our Story</span>
+                    <h2 class="about-title">Reviving the Art of Fresh Masalas</h2>
+                    <div class="about-paragraphs">
+                        <p>In every Indian household, the aroma of freshly roasted and ground spices tells a story of tradition, love, and authenticity. Yet somewhere along the way, we traded this ritual for the convenience of pre-ground masalas that sit on shelves for months, losing their soul.</p>
+                        
+                        <p>The Masala Box was born from a simple belief: that great cooking deserves great spices. We source directly from small farms across India—the cardamom hills of Kerala, the turmeric fields of Salem, the chili markets of Guntur—working with farmers who've perfected their craft over generations.</p>
+                        
+                        <p>When you roast and grind your own masala, you're not just cooking—you're participating in an ancient culinary tradition. The sizzle of cumin seeds, the heady perfume of cinnamon, the warmth of freshly cracked pepper. This is what real cooking smells like. This is what real food tastes like.</p>
+                    </div>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <span class="stat-number">50+</span>
+                            <span class="stat-label">Spice Varieties</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">12</span>
+                            <span class="stat-label">Partner Farms</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Natural</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-circle small">
+                        <span>MB</span>
+                    </div>
+                    <span class="footer-brand">The Masala Box</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#signature-blends">Shop</a>
+                    <a href="#about">About</a>
+                    <a href="#" id="contact-link">Contact</a>
+                </div>
+                <div class="footer-copy">
+                    © 2026 The Masala Box
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-overlay" id="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div class="modal-body" id="modal-body">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal" id="contact-modal">
+        <div class="modal-overlay" id="contact-modal-overlay"></div>
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close" id="contact-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div class="modal-body contact-modal-body">
+                <div class="contact-header">
+                    <div class="logo-circle small"><span>MB</span></div>
+                    <h2 class="section-title">Contact Us</h2>
+                    <p class="contact-subtitle">Have a question or feedback? We'd love to hear from you.</p>
+                </div>
+                <form id="contact-form" class="contact-form">
+                    <div class="form-group">
+                        <label for="contact-name">Name</label>
+                        <input type="text" id="contact-name" name="name" required placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-email">Email</label>
+                        <input type="email" id="contact-email" name="email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-subject">Subject</label>
+                        <select id="contact-subject" name="subject" required>
+                            <option value="">Select a topic</option>
+                            <option value="order">Order Inquiry</option>
+                            <option value="product">Product Question</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" name="message" required placeholder="Tell us more..." rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                </form>
+                <div id="contact-success" class="contact-success" style="display: none;">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                        <circle cx="30" cy="30" r="28" stroke="#d4a853" stroke-width="3"/>
+                        <path d="M20 30L27 37L40 24" stroke="#d4a853" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h3>Thank You!</h3>
+                    <p>Your message has been sent successfully. We'll get back to you soon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="search-modal">
+        <div class="search-modal-overlay" id="search-modal-overlay"></div>
+        <div class="search-modal-content">
+            <button class="modal-close" id="search-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search for masalas, spices..." autocomplete="off">
+                <div class="search-results" id="search-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="cart-close" id="cart-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <div class="cart-empty">
+                <p>Your cart is empty</p>
+            </div>
+        </div>
+        <div class="cart-footer" id="cart-footer" style="display: none;">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-amount" id="total-amount">$0.00</span>
+            </div>
+            <button class="btn btn-primary btn-checkout">Checkout</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-overlay" id="auth-modal-overlay"></div>
+        <div class="modal-content" style="max-width: 420px;">
+            <button class="modal-close" id="auth-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div class="modal-body auth-modal-body">
+                <div class="auth-header">
+                    <div class="logo-circle small"><span>MB</span></div>
+                    <h2 class="section-title" id="auth-title">Welcome Back</h2>
+                </div>
+
+                <!-- Auth Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Login</button>
+                    <button class="auth-tab" data-tab="signup">Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" name="email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" name="password" required placeholder="Enter password">
+                    </div>
+                    <p class="auth-error" id="login-error"></p>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                    <p class="forgot-password-link">
+                        <a href="#" id="forgot-password-link">Forgot your password?</a>
+                    </p>
+                </form>
+
+                <!-- Forgot Password Form -->
+                <form id="forgot-password-form" class="auth-form" style="display: none;">
+                    <p class="forgot-password-desc">Enter your email address and we'll send you a link to reset your password.</p>
+                    <div class="form-group">
+                        <label for="forgot-email">Email</label>
+                        <input type="email" id="forgot-email" name="email" required placeholder="your@email.com">
+                    </div>
+                    <p class="auth-error" id="forgot-error"></p>
+                    <p class="auth-success" id="forgot-success"></p>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Reset Link</button>
+                    <p class="back-to-login">
+                        <a href="#" id="back-to-login-link">← Back to Login</a>
+                    </p>
+                </form>
+
+                <!-- Reset Password Form (shown after clicking reset link) -->
+                <form id="reset-password-form" class="auth-form" style="display: none;">
+                    <p class="reset-password-desc">Enter your new password below.</p>
+                    <div class="form-group">
+                        <label for="reset-password">New Password</label>
+                        <input type="password" id="reset-password" name="password" required placeholder="Min 6 characters" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="reset-password-confirm">Confirm Password</label>
+                        <input type="password" id="reset-password-confirm" name="password_confirm" required placeholder="Confirm password" minlength="6">
+                    </div>
+                    <input type="hidden" id="reset-token" name="token">
+                    <p class="auth-error" id="reset-error"></p>
+                    <p class="auth-success" id="reset-success"></p>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Reset Password</button>
+                </form>
+
+                <!-- Signup Form -->
+                <form id="signup-form" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" name="name" required placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" name="email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-phone">Phone (optional)</label>
+                        <input type="tel" id="signup-phone" name="phone" placeholder="+91 XXXXXXXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" name="password" required placeholder="Min 6 characters" minlength="6">
+                    </div>
+                    <p class="auth-error" id="signup-error"></p>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                </form>
+
+                <!-- Logged In View -->
+                <div id="logged-in-view" class="logged-in-view" style="display: none;">
+                    <div class="user-avatar">
+                        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                            <circle cx="30" cy="30" r="28" stroke="#d4a853" stroke-width="2"/>
+                            <circle cx="30" cy="22" r="10" stroke="#d4a853" stroke-width="2"/>
+                            <path d="M10 52C10 42 19 34 30 34C41 34 50 42 50 52" stroke="#d4a853" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="user-greeting">Hello, <span id="user-display-name"></span>!</h3>
+                    <p class="user-email" id="user-display-email"></p>
+
+                    <!-- Addresses Section -->
+                    <div class="addresses-section">
+                        <div class="addresses-header">
+                            <h4>Saved Addresses</h4>
+                            <button class="btn btn-small btn-outline" id="add-address-btn">+ Add New</button>
+                        </div>
+                        <div class="addresses-list" id="addresses-list">
+                            <!-- Addresses loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="view-orders-btn" style="width: 100%; margin-top: 1rem;">My Orders</button>
+                    <button class="btn btn-outline" id="logout-btn" style="width: 100%; margin-top: 0.5rem;">Logout</button>
+                </div>
+
+                <!-- Order History View -->
+                <div id="orders-view" class="orders-view" style="display: none;">
+                    <button class="back-btn" id="back-to-account">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        Back to Account
+                    </button>
+                    <h3 class="orders-title">My Orders</h3>
+                    <div class="orders-list" id="orders-list">
+                        <!-- Orders loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Add/Edit Address Form (hidden by default) -->
+                <div id="address-form-view" class="address-form-view" style="display: none;">
+                    <h3 class="address-form-title">Add New Address</h3>
+                    <form id="address-form" class="auth-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="addr-label">Label</label>
+                                <select id="addr-label" name="label">
+                                    <option value="Home">Home</option>
+                                    <option value="Work">Work</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="addr-phone">Phone</label>
+                                <input type="tel" id="addr-phone" name="phone" required placeholder="+91 XXXXXXXXXX">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="addr-name">Full Name</label>
+                            <input type="text" id="addr-name" name="full_name" required placeholder="Recipient's name">
+                        </div>
+                        <div class="form-group">
+                            <label for="addr-line1">Address Line 1</label>
+                            <input type="text" id="addr-line1" name="address_line1" required placeholder="House/Flat No., Building, Street">
+                        </div>
+                        <div class="form-group">
+                            <label for="addr-line2">Address Line 2 (Optional)</label>
+                            <input type="text" id="addr-line2" name="address_line2" placeholder="Landmark, Area">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="addr-city">City</label>
+                                <input type="text" id="addr-city" name="city" required placeholder="City">
+                            </div>
+                            <div class="form-group">
+                                <label for="addr-state">State</label>
+                                <input type="text" id="addr-state" name="state" required placeholder="State">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="addr-pincode">Pincode</label>
+                                <input type="text" id="addr-pincode" name="pincode" required placeholder="6-digit pincode" pattern="[0-9]{6}">
+                            </div>
+                            <div class="form-group form-checkbox">
+                                <label>
+                                    <input type="checkbox" id="addr-default" name="is_default">
+                                    Set as default
+                                </label>
+                            </div>
+                        </div>
+                        <input type="hidden" id="addr-id" name="address_id">
+                        <p class="auth-error" id="address-error"></p>
+                        <div class="form-buttons">
+                            <button type="button" class="btn btn-outline" id="cancel-address-btn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Address</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/{{ whatsapp_number }}?text={{ whatsapp_message | urlencode }}"
+       target="_blank"
+       class="whatsapp-float"
+       aria-label="Chat on WhatsApp">
+        <svg viewBox="0 0 32 32" fill="currentColor">
+            <path d="M16.004 0C7.177 0 0 7.177 0 16.004c0 2.825.736 5.583 2.137 8.013L0 32l8.188-2.137A15.922 15.922 0 0016.004 32C24.831 32 32 24.823 32 15.996 32 7.177 24.831 0 16.004 0zm0 29.39a13.385 13.385 0 01-6.828-1.867l-.489-.293-5.073 1.329 1.354-4.942-.32-.511a13.329 13.329 0 01-2.038-7.102C2.61 8.601 8.601 2.61 16.004 2.61c7.395 0 13.386 5.991 13.386 13.394 0 7.395-5.991 13.386-13.386 13.386zm7.339-10.025c-.403-.2-2.378-1.172-2.746-1.306-.368-.134-.636-.2-.904.201-.268.402-1.038 1.306-1.273 1.574-.235.268-.469.301-.871.1-.403-.2-1.699-.626-3.235-1.996-1.196-1.066-2.003-2.383-2.238-2.786-.234-.402-.024-.62.177-.82.18-.18.402-.469.603-.703.2-.235.268-.402.402-.67.134-.268.067-.502-.034-.703-.1-.2-.903-2.177-1.238-2.98-.326-.782-.657-.676-.903-.689-.234-.012-.502-.014-.77-.014s-.703.1-1.071.502c-.368.402-1.406 1.374-1.406 3.35s1.44 3.886 1.64 4.154c.2.268 2.834 4.328 6.869 6.07.96.414 1.709.661 2.293.847.964.306 1.84.263 2.534.16.773-.116 2.378-.972 2.714-1.91.335-.94.335-1.743.234-1.91-.1-.168-.368-.268-.77-.469z"/>
+        </svg>
+    </a>
+
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <div class="modal" id="checkout-view" style="display: none; z-index: 2000;">
+        <div class="modal-overlay" onclick="closeCheckout()"></div>
+        <div class="modal-content" style="max-width: 650px; width: 90%;">
+            <button class="modal-close" onclick="closeCheckout()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+
+            <div class="modal-body" style="padding: 40px; display: block !important;">
+                <div class="logo-circle small" style="margin: 0 auto 20px;"><span>MB</span></div>
+                <h2 class="section-title" style="margin-bottom: 30px;">Checkout</h2>
+
+                <!-- Login prompt for guests -->
+                <div id="checkout-login-prompt" class="checkout-login-prompt" style="display: none;">
+                    <p>Please login to continue with checkout</p>
+                    <button class="btn btn-primary" onclick="closeCheckout(); openAuthModal();">Login / Sign Up</button>
+                </div>
+
+                <!-- Checkout content for logged in users -->
+                <div id="checkout-content" style="display: none;">
+                    <!-- Delivery Address Section -->
+                    <div class="checkout-section">
+                        <h3 class="checkout-section-title">Delivery Address</h3>
+                        <div id="checkout-addresses" class="checkout-addresses">
+                            <!-- Addresses loaded dynamically -->
+                        </div>
+                        <button class="btn btn-small btn-outline" id="checkout-add-address-btn" style="margin-top: 10px;">+ Add New Address</button>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="checkout-section">
+                        <h3 class="checkout-section-title">Order Summary</h3>
+                        <div id="checkout-summary-details"></div>
+                    </div>
+
+                    <div class="promo-container">
+                        <label for="promo-token" class="promo-label">Have a promo code?</label>
+                        <div class="promo-input-group">
+                            <input type="text" id="promo-token" placeholder="e.g. WELCOME10" aria-label="Promo Code">
+                            <button type="button" id="apply-token-btn">Apply</button>
+                        </div>
+                        <p id="token-status"></p>
+                    </div>
+
+                    <button id="pay-now-btn" class="btn btn-primary" style="width: 100%; margin-top: 30px; font-weight: bold; letter-spacing: 1px;">
+                        PAY NOW
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

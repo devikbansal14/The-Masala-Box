@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - The Masala Box</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #242424;
+            --accent-gold: #d4a853;
+            --accent-hover: #c49a3c;
+            --text-primary: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --border-color: #3d3d3d;
+            --success: #4CAF50;
+            --warning: #ffd700;
+            --danger: #f44336;
+            --info: #2196F3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-gold);
+            font-size: 1.125rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--bg-primary);
+            color: var(--accent-gold);
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--accent-gold);
+        }
+
+        .back-link {
+            color: var(--accent-gold);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .stat-change {
+            font-size: 0.8125rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        /* Tables */
+        .table-container {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-primary);
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: var(--bg-primary);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-placed { background-color: var(--warning); color: #1a1a1a; }
+        .status-confirmed { background-color: var(--success); color: white; }
+        .status-shipped { background-color: var(--info); color: white; }
+        .status-delivered { background-color: #9C27B0; color: white; }
+        .status-cancelled { background-color: var(--danger); color: white; }
+        .status-pending { background-color: var(--warning); color: #1a1a1a; }
+        .status-paid { background-color: var(--success); color: white; }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-gold);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .btn-small {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Action buttons */
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        select {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover, .tab.active {
+            color: var(--accent-gold);
+            border-bottom-color: var(--accent-gold);
+        }
+
+        /* Section */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Message card */
+        .message-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-from {
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        .message-date {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .message-subject {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-body {
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 1rem 0.5rem;
+            }
+
+            .sidebar-logo .logo-text,
+            .nav-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Admin Login Styles */
+        .admin-login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-primary);
+        }
+
+        .admin-login-box {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .admin-login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-login-header .logo-circle {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            font-size: 1.25rem;
+        }
+
+        .admin-login-header h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-login-header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .admin-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .admin-form label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-form input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .admin-form input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        .admin-form .btn {
+            width: 100%;
+            padding: 0.875rem;
+            font-size: 1rem;
+        }
+
+        .admin-error {
+            color: var(--danger);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .admin-access-denied {
+            text-align: center;
+        }
+
+        .admin-access-denied svg {
+            width: 80px;
+            height: 80px;
+            color: var(--danger);
+            margin-bottom: 1rem;
+        }
+
+        .admin-access-denied h2 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-access-denied p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .back-to-store {
+            display: inline-block;
+            color: var(--accent-gold);
+            text-decoration: none;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    {% if not authenticated %}
+    <!-- Admin Login Screen -->
+    <div class="admin-login-container">
+        <div class="admin-login-box">
+            <div class="admin-login-header">
+                <div class="logo-circle">MB</div>
+                <h1>Admin Panel</h1>
+                <p>Sign in to access the dashboard</p>
+            </div>
+            <form class="admin-form" id="admin-login-form">
+                <div class="form-group">
+                    <label for="admin-email">Email</label>
+                    <input type="email" id="admin-email" name="email" required placeholder="admin@themasalabox.com">
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" name="password" required placeholder="Enter password">
+                </div>
+                <p class="admin-error" id="admin-login-error"></p>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+            <a href="/" class="back-to-store">← Back to Store</a>
+        </div>
+    </div>
+    <script>
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('admin-login-error');
+            errorEl.textContent = '';
+
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Reload page to check admin status
+                    window.location.reload();
+                } else {
+                    errorEl.textContent = data.error || 'Login failed';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Network error. Please try again.';
+            }
+        });
+    </script>
+    {% elif not is_admin %}
+    <!-- Access Denied Screen -->
+    <div class="admin-login-container">
+        <div class="admin-login-box admin-access-denied">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M15 9L9 15M9 9l6 6"/>
+            </svg>
+            <h2>Access Denied</h2>
+            <p>Your account does not have admin privileges.</p>
+            <button class="btn btn-outline" onclick="logout()">Sign Out</button>
+            <br>
+            <a href="/" class="back-to-store">← Back to Store</a>
+        </div>
+    </div>
+    <script>
+        async function logout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.reload();
+        }
+    </script>
+    {% else %}
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-circle">MB</div>
+            <span class="logo-text">Admin</span>
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#orders" class="nav-link" data-section="orders">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"/></svg>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#products" class="nav-link" data-section="products">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2L3 7v11h14V7l-7-5zm0 2.236L15 8v8H5V8l5-3.764z" clip-rule="evenodd"/></svg>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#customers" class="nav-link" data-section="customers">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#messages" class="nav-link" data-section="messages">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                        <span>Messages</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard</h1>
+            <a href="/" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="2"/></svg>
+                Back to Store
+            </a>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Orders</div>
+                    <div class="stat-value" id="stat-orders">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Revenue</div>
+                    <div class="stat-value" id="stat-revenue">₹0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Customers</div>
+                    <div class="stat-value" id="stat-customers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Products</div>
+                    <div class="stat-value" id="stat-products">0</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="table-title">Recent Orders</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-orders">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section id="orders" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="table-title">All Orders</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-orders">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="table-title">Products</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-products">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Customers Section -->
+        <section id="customers" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="table-title">Customers</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Joined</th>
+                            <th>Orders</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-customers">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Messages Section -->
+        <section id="messages" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="table-title">Contact Messages</h3>
+                </div>
+                <div id="all-messages" style="padding: 1rem;">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.dataset.section;
+
+                // Update active states
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+
+                // Update page title
+                document.querySelector('.page-title').textContent =
+                    section.charAt(0).toUpperCase() + section.slice(1);
+            });
+        });
+
+        // Format price
+        function formatPrice(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Format date
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+
+                document.getElementById('stat-orders').textContent = data.total_orders;
+                document.getElementById('stat-revenue').textContent = formatPrice(data.total_revenue);
+                document.getElementById('stat-customers').textContent = data.total_customers;
+                document.getElementById('stat-products').textContent = data.total_products;
+
+                // Recent orders
+                const tbody = document.getElementById('recent-orders');
+                tbody.innerHTML = data.recent_orders.map(order => `
+                    <tr>
+                        <td><strong>${order.order_number}</strong></td>
+                        <td>${order.customer_name || 'N/A'}</td>
+                        <td>${formatDate(order.created_at)}</td>
+                        <td>${formatPrice(order.total_amount)}</td>
+                        <td><span class="status-badge status-${order.order_status}">${order.order_status}</span></td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No orders yet</td></tr>';
+
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+
+        // Load orders
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/admin/orders');
+                const data = await response.json();
+
+                const tbody = document.getElementById('all-orders');
+                tbody.innerHTML = data.orders.map(order => `
+                    <tr>
+                        <td><strong>${order.order_number}</strong></td>
+                        <td>${order.customer_name || 'N/A'}<br><small style="color:var(--text-muted)">${order.customer_email || ''}</small></td>
+                        <td>${order.item_count} items</td>
+                        <td>${formatPrice(order.total_amount)}</td>
+                        <td><span class="status-badge status-${order.payment_status}">${order.payment_status}</span></td>
+                        <td><span class="status-badge status-${order.order_status}">${order.order_status}</span></td>
+                        <td>
+                            <select onchange="updateOrderStatus(${order.id}, this.value)" style="font-size:0.75rem;">
+                                <option value="placed" ${order.order_status === 'placed' ? 'selected' : ''}>Placed</option>
+                                <option value="confirmed" ${order.order_status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="shipped" ${order.order_status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="delivered" ${order.order_status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="cancelled" ${order.order_status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No orders yet</td></tr>';
+
+            } catch (error) {
+                console.error('Failed to load orders:', error);
+            }
+        }
+
+        // Update order status
+        async function updateOrderStatus(orderId, status) {
+            try {
+                await fetch(`/api/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                loadOrders();
+                loadDashboard();
+            } catch (error) {
+                console.error('Failed to update order:', error);
+            }
+        }
+
+        // Load products
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+
+                const tbody = document.getElementById('all-products');
+                tbody.innerHTML = products.map(p => `
+                    <tr>
+                        <td><strong>${p.name}</strong><br><small style="color:var(--text-muted)">${p.subtitle}</small></td>
+                        <td>${p.category === 'signature_blend' ? 'Signature Blend' : 'Single Origin'}</td>
+                        <td>${formatPrice(p.price)}</td>
+                        <td>${'★'.repeat(p.rating)}${'☆'.repeat(5-p.rating)}</td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Failed to load products:', error);
+            }
+        }
+
+        // Load customers
+        async function loadCustomers() {
+            try {
+                const response = await fetch('/api/admin/customers');
+                const data = await response.json();
+
+                const tbody = document.getElementById('all-customers');
+                tbody.innerHTML = data.customers.map(c => `
+                    <tr>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.email}</td>
+                        <td>${c.phone || '-'}</td>
+                        <td>${formatDate(c.created_at)}</td>
+                        <td>${c.order_count}</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No customers yet</td></tr>';
+
+            } catch (error) {
+                console.error('Failed to load customers:', error);
+            }
+        }
+
+        // Load messages
+        async function loadMessages() {
+            try {
+                const response = await fetch('/api/contact/messages');
+                const data = await response.json();
+
+                const container = document.getElementById('all-messages');
+                container.innerHTML = data.messages.map(m => `
+                    <div class="message-card">
+                        <div class="message-header">
+                            <span class="message-from">${m.name} (${m.email})</span>
+                            <span class="message-date">${formatDate(m.created_at)}</span>
+                        </div>
+                        <div class="message-subject">Subject: ${m.subject}</div>
+                        <div class="message-body">${m.message}</div>
+                    </div>
+                `).join('') || '<p style="text-align:center;color:var(--text-muted);padding:2rem;">No messages yet</p>';
+
+            } catch (error) {
+                console.error('Failed to load messages:', error);
+            }
+        }
+
+        // Initial load
+        loadDashboard();
+        loadOrders();
+        loadProducts();
+        loadCustomers();
+        loadMessages();
+    </script>
+    {% endif %}
+</body>
+</html>

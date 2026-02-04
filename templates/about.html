@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story | The Masala Box</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <a href="/" class="logo" style="text-decoration: none;">
+                        <div class="logo-circle">
+                            <span>MB</span>
+                        </div>
+                        <div class="logo-text">
+                            <h1>The Masala Box</h1>
+                            <p class="tagline">Real Spices. Real Masalas</p>
+                        </div>
+                    </a>
+                </div>
+
+                <nav class="nav" id="nav">
+                    <a href="/#signature-blends" class="nav-link">Signature Blends</a>
+                    <a href="/#single-origins" class="nav-link">Single Origins</a>
+                    <a href="/about" class="nav-link">About Us</a>
+                </nav>
+
+                <div class="header-actions">
+                    <a href="/" class="btn btn-outline btn-small">Back to Shop</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Hero -->
+    <section class="section about-section" style="padding-top: 8rem;">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image">
+                    <svg class="about-illustration" viewBox="0 0 400 500" fill="none">
+                        <circle cx="200" cy="250" r="120" fill="#d4a853" opacity="0.1"/>
+                        <path d="M100 220 L100 350 Q100 380 130 390 L270 390 Q300 380 300 350 L300 220 Q300 200 280 190 L120 190 Q100 200 100 220 Z"
+                              fill="#242424" stroke="#d4a853" stroke-width="3"/>
+                        <ellipse cx="200" cy="220" rx="100" ry="30" fill="#1a1a1a" stroke="#d4a853" stroke-width="3"/>
+                        <g opacity="0.6">
+                            <circle cx="150" cy="280" r="12" fill="#d4a853"/>
+                            <circle cx="250" cy="300" r="10" fill="#c49a3c"/>
+                            <path d="M200 320 L206 326 L200 332 L194 326 Z" fill="#d4a853"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="about-text">
+                    <span class="about-label">{{ info.title }}</span>
+                    <h2 class="about-title">Reviving the Art of Fresh Masalas</h2>
+                    <div class="about-paragraphs">
+                        <p>{{ info.description }}</p>
+                        <p>{{ info.mission }}</p>
+                        <p>In every Indian household, the aroma of freshly roasted and ground spices tells a story of tradition, love, and authenticity. Yet somewhere along the way, we traded this ritual for the convenience of pre-ground masalas that sit on shelves for months, losing their soul.</p>
+                        <p>The Masala Box was born from a simple belief: that great cooking deserves great spices. We source directly from small farms across India—the cardamom hills of Kerala, the turmeric fields of Salem, the chili markets of Guntur.</p>
+                    </div>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <span class="stat-number">50+</span>
+                            <span class="stat-label">Spice Varieties</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">12</span>
+                            <span class="stat-label">Partner Farms</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Natural</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-circle small">
+                        <span>MB</span>
+                    </div>
+                    <span class="footer-brand">The Masala Box</span>
+                </div>
+                <div class="footer-links">
+                    <a href="/#signature-blends">Shop</a>
+                    <a href="/about">About</a>
+                </div>
+                <div class="footer-copy">
+                    &copy; 2026 The Masala Box
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

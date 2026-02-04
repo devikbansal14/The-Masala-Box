@@ -1,0 +1,19 @@
+<div class="summary"></div>
+    <p>Subtotal: ₹{{ subtotal }}</p>
+    <p>Delivery: {{ 'FREE' if delivery_fee == 0 else '₹' ~ delivery_fee }}</p>
+    <p><strong>Total: ₹{{ total }}</strong></p>
+    
+    <form method="POST">
+        <input type="text" name="token" placeholder="Enter Token">
+        <button type="submit">Apply Token</button>
+    </form>
+    
+    <button onclick="processPayment()" class="pay-btn">Pay Now</button>
+</div>
+
+<script>
+function processPayment() {
+    alert("We are just checking the market acceptance of product. Thank you for visiting us!");
+    window.location.href = "/";
+}
+</script>
