@@ -449,17 +449,20 @@ def get_cart():
 
 @app.route('/api/cart/add', methods=['POST'])
 def add_to_cart():
-    """Add item to cart (works for both logged-in users and guests)."""
-    data = request.json
-    product_id = data.get('product_id')
-    quantity = data.get('quantity', 1)
-    weight = data.get('weight', '200g')  # Default weight
-    price_override = data.get('price_override')  # Custom price based on weight
+    data = request.json or {}
 
-    # Validate product exists
-    conn = sqlite3.connect(DATABASE['path'])
-    conn.row_factory = sqlite3.Row
+    product_id = data.get('product_id')
+    quantity = int(data.get('quantity', 1))
+    weight = data.get('weight', '200g')
+    price_override = data.get('price_override')
+
+    if not product_id:
+        return jsonify({'success': False, 'error': 'Product ID required'}), 400
+
+    conn = get_db()
     cursor = conn.cursor()
+
+    # 1️⃣ Validate product
     cursor.execute('SELECT * FROM products WHERE id = %s', (product_id,))
     product = cursor.fetchone()
 
@@ -467,65 +470,74 @@ def add_to_cart():
         conn.close()
         return jsonify({'success': False, 'error': 'Product not found'}), 404
 
-    # Validate price_override against actual product prices
-    valid_price = product['price']  # Default price
+    # 2️⃣ Resolve correct price
+    valid_price = product['price']
 
-    # Check if product has weight options (single origin products)
     if product['category'] == 'single_origin':
-        # Get weight options from products.py
         for orig in SINGLE_ORIGINS:
             if orig['name'] == product['name']:
                 weight_options = orig.get('weight_options', {})
-                if weight in weight_options:
-                    valid_price = weight_options[weight]
-                elif weight_options:
-                    # Weight not found in options
+                if weight not in weight_options:
                     conn.close()
-                    return jsonify({'success': False, 'error': f'Invalid weight: {weight}'}), 400
+                    return jsonify({'success': False, 'error': 'Invalid weight'}), 400
+                valid_price = weight_options[weight]
                 break
 
-    # Verify price_override matches the valid price (prevent price manipulation)
-    if price_override is not None:
-        if int(price_override) != int(valid_price):
-            conn.close()
-            return jsonify({'success': False, 'error': 'Invalid price'}), 400
-    else:
-        price_override = valid_price
+    if price_override is not None and float(price_override) != float(valid_price):
+        conn.close()
+        return jsonify({'success': False, 'error': 'Price tampering detected'}), 400
 
-    cursor = conn.cursor()
+    price_override = valid_price
 
-    # Check if user is logged in or guest
+    # 3️⃣ Logged-in user cart
     if 'user_id' in session:
-        # Logged-in user: use user_id
         cursor.execute(
-            'SELECT id, quantity FROM cart WHERE user_id = %s AND product_id = %s AND weight = %s',
+            '''
+            SELECT id, quantity FROM cart
+            WHERE user_id = %s AND product_id = %s AND weight = %s
+            ''',
             (session['user_id'], product_id, weight)
         )
         existing = cursor.fetchone()
 
         if existing:
-            new_quantity = existing[1] + quantity
-            cursor.execute('UPDATE cart SET quantity = %s WHERE id = %s', (new_quantity, existing[0]))
+            cursor.execute(
+                'UPDATE cart SET quantity = %s WHERE id = %s',
+                (existing['quantity'] + quantity, existing['id'])
+            )
         else:
             cursor.execute(
-                'INSERT INTO cart (user_id, product_id, quantity, weight, price_override) VALUES (?, ?, ?, ?, ?)',
+                '''
+                INSERT INTO cart (user_id, product_id, quantity, weight, price_override)
+                VALUES (%s, %s, %s, %s, %s)
+                ''',
                 (session['user_id'], product_id, quantity, weight, price_override)
             )
+
+    # 4️⃣ Guest cart
     else:
-        # Guest: use session_id
         session_id = get_session_id()
         cursor.execute(
-            'SELECT id, quantity FROM cart WHERE session_id = %s AND user_id IS NULL AND product_id = %s AND weight = %s',
+            '''
+            SELECT id, quantity FROM cart
+            WHERE session_id = %s AND user_id IS NULL
+              AND product_id = %s AND weight = %s
+            ''',
             (session_id, product_id, weight)
         )
         existing = cursor.fetchone()
 
         if existing:
-            new_quantity = existing[1] + quantity
-            cursor.execute('UPDATE cart SET quantity = %s WHERE id = %s', (new_quantity, existing[0]))
+            cursor.execute(
+                'UPDATE cart SET quantity = %s WHERE id = %s',
+                (existing['quantity'] + quantity, existing['id'])
+            )
         else:
             cursor.execute(
-                'INSERT INTO cart (session_id, product_id, quantity, weight, price_override) VALUES (?, ?, ?, ?, ?)',
+                '''
+                INSERT INTO cart (session_id, product_id, quantity, weight, price_override)
+                VALUES (%s, %s, %s, %s, %s)
+                ''',
                 (session_id, product_id, quantity, weight, price_override)
             )
 
@@ -533,6 +545,7 @@ def add_to_cart():
     conn.close()
 
     return jsonify({'success': True})
+
 
 
 @app.route('/api/cart/update', methods=['POST'])
@@ -543,7 +556,7 @@ def update_cart_quantity():
     action = data.get('action')  # 'increase' or 'decrease'
     weight = data.get('weight', '200g')
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # Check if user is logged in or guest
@@ -582,7 +595,7 @@ def remove_from_cart():
     product_id = request.json.get('product_id')
     weight = request.json.get('weight', '200g')
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # Check if user is logged in or guest
@@ -619,7 +632,7 @@ def validate_promo_code():
 
     # If user is logged in, check if they've already used this code
     if 'user_id' in session:
-        conn = sqlite3.connect(DATABASE['path'])
+        conn = get_db()
         cursor = conn.cursor()
         cursor.execute('''
             SELECT id FROM orders
@@ -673,7 +686,7 @@ def signup():
     if len(password) < 6:
         return jsonify({'success': False, 'error': 'Password must be at least 6 characters'}), 400
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # Check if email already exists
@@ -716,7 +729,7 @@ def login():
     if not email or not password:
         return jsonify({'success': False, 'error': 'Email and password required'}), 400
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
@@ -777,7 +790,7 @@ def forgot_password():
     if not email:
         return jsonify({'success': False, 'error': 'Email is required'}), 400
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
@@ -865,7 +878,7 @@ def reset_password():
     if len(new_password) < 6:
         return jsonify({'success': False, 'error': 'Password must be at least 6 characters'}), 400
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
@@ -932,7 +945,7 @@ def add_address():
         if not data.get(field, '').strip():
             return jsonify({'success': False, 'error': f'{field.replace("_", " ").title()} is required'}), 400
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # If this is the first address or marked as default, update others
@@ -976,7 +989,7 @@ def update_address(address_id):
 
     data = request.json
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # Verify address belongs to user
@@ -1020,7 +1033,7 @@ def delete_address(address_id):
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Please login first'}), 401
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # Verify address belongs to user
@@ -1053,7 +1066,7 @@ def set_default_address(address_id):
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Please login first'}), 401
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # Verify address belongs to user
@@ -1098,7 +1111,7 @@ def create_order():
     if not address_id:
         return jsonify({'success': False, 'error': 'Please select a delivery address'}), 400
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
@@ -1330,7 +1343,7 @@ def verify_payment():
     razorpay_signature = data.get('razorpay_signature')
     test_mode = data.get('test_mode', False)
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     # Get order
@@ -1440,7 +1453,7 @@ def contact_form():
         return jsonify({'success': False, 'error': 'All fields are required'}), 400
 
     # Store in database
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
         'INSERT INTO contact_messages (name, email, subject, message) VALUES (?, ?, ?, ?)',
@@ -1566,7 +1579,7 @@ def update_order_status(order_id):
     if new_status not in valid_statuses:
         return jsonify({'success': False, 'error': 'Invalid status'}), 400
 
-    conn = sqlite3.connect(DATABASE['path'])
+    conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute(
