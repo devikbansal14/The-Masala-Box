@@ -38,6 +38,20 @@ SITE_CONFIG = {
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+try:
+    import razorpay
+except ImportError:
+    razorpay = None
+
+RAZORPAY_ENABLED = False
+razorpay_client = None
+
+if RAZORPAY.get("key_id") and RAZORPAY.get("key_secret") and razorpay:
+    RAZORPAY_ENABLED = True
+    razorpay_client = razorpay.Client(
+        auth=(RAZORPAY["key_id"], RAZORPAY["key_secret"])
+    )
+
 def get_db():
     """Get a Postgres connection with dict cursor."""
     return psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
