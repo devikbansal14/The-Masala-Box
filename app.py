@@ -575,8 +575,8 @@ def update_cart_quantity():
     row = cursor.fetchone()
 
     if row:
-        cart_id = row[0]
-        current_qty = row[1]
+        cart_id = row['id']
+        current_qty = row['quantity']
         new_qty = current_qty + 1 if action == 'increase' else current_qty - 1
 
         if new_qty <= 0:
@@ -701,7 +701,7 @@ def signup():
         'INSERT INTO users (name, email, phone, password_hash) VALUES (%s, %s, %s, %s)',
         (name, email, phone, password_hash)
     )
-    user_id = cursor.lastrowid
+    user_id = cursor.fetchone()['id']
     conn.commit()
     conn.close()
 
@@ -730,7 +730,7 @@ def login():
         return jsonify({'success': False, 'error': 'Email and password required'}), 400
 
     conn = get_db()
-    conn.row_factory = sqlite3.Row
+    # conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
@@ -791,7 +791,7 @@ def forgot_password():
         return jsonify({'success': False, 'error': 'Email is required'}), 400
 
     conn = get_db()
-    conn.row_factory = sqlite3.Row
+    # conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     # Find user by email
@@ -879,14 +879,14 @@ def reset_password():
         return jsonify({'success': False, 'error': 'Password must be at least 6 characters'}), 400
 
     conn = get_db()
-    conn.row_factory = sqlite3.Row
+    # conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     # Find valid token
     cursor.execute('''
         SELECT t.*, u.email, u.name FROM password_reset_tokens t
         JOIN users u ON t.user_id = u.id
-        WHERE t.token = %s AND t.used = 0 AND t.expires_at > datetime('now')
+        WHERE t.token = %s AND t.used = 0 AND t.expires_at > NOW()
     ''', (token,))
     token_row = cursor.fetchone()
 
@@ -955,7 +955,7 @@ def add_address():
 
     # Check if this is user's first address (make it default)
     cursor.execute('SELECT COUNT(*) FROM addresses WHERE user_id = %s', (session['user_id'],))
-    if cursor.fetchone()[0] == 0:
+    if cursor.fetchone()['count'] == 0:
         is_default = True
 
     cursor.execute('''
@@ -974,7 +974,7 @@ def add_address():
         1 if is_default else 0
     ))
 
-    address_id = cursor.lastrowid
+    address_id = cursor.fetchone()['id']
     conn.commit()
     conn.close()
 
@@ -1043,7 +1043,7 @@ def delete_address(address_id):
         conn.close()
         return jsonify({'success': False, 'error': 'Address not found'}), 404
 
-    was_default = row[0]
+    was_default = row['is_default']
 
     cursor.execute('DELETE FROM addresses WHERE id = %s AND user_id = %s', (address_id, session['user_id']))
 
@@ -1112,7 +1112,7 @@ def create_order():
         return jsonify({'success': False, 'error': 'Please select a delivery address'}), 400
 
     conn = get_db()
-    conn.row_factory = sqlite3.Row
+    # conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     # Verify address belongs to user
@@ -1173,7 +1173,7 @@ def create_order():
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     ''', (order_number, session['user_id'], address_id, subtotal, discount, delivery_fee, total_amount, promo_code or None))
 
-    order_id = cursor.lastrowid
+    order_id = cursor.fetchone()['id']
 
     # Add order items
     for item in cart_items:
@@ -1508,19 +1508,19 @@ def admin_stats():
 
     # Total orders
     cursor.execute('SELECT COUNT(*) FROM orders')
-    total_orders = cursor.fetchone()[0]
+    total_orders = cursor.fetchone()['count']
 
     # Total revenue (only paid orders)
     cursor.execute("SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE payment_status = 'paid'")
-    total_revenue = cursor.fetchone()[0]
+    total_revenue = cursor.fetchone()['coalesce']
 
     # Total customers
     cursor.execute('SELECT COUNT(*) FROM users')
-    total_customers = cursor.fetchone()[0]
+    total_customers = cursor.fetchone()['count']
 
     # Total products
     cursor.execute('SELECT COUNT(*) FROM products')
-    total_products = cursor.fetchone()[0]
+    total_products = cursor.fetchone()['count']
 
     # Recent orders
     cursor.execute('''
