@@ -26,11 +26,6 @@ from products import SIGNATURE_BLENDS, SINGLE_ORIGINS, ALL_PRODUCTS
 # APP INITIALIZATION
 # =============================================================================
 
-app = Flask(__name__)
-app.secret_key = FLASK_CONFIG['secret_key']
-with app.app_context():
-    init_db()
-    seed_products()
 
 SITE_CONFIG = {
     "about_us": ABOUT,
@@ -267,6 +262,12 @@ def merge_guest_cart_to_user(user_id):
     cursor.execute("DELETE FROM cart WHERE session_id = %s AND user_id IS NULL", (session_id,))
     conn.commit()
     conn.close()
+
+app = Flask(__name__)
+app.secret_key = FLASK_CONFIG['secret_key']
+with app.app_context():
+    init_db()
+    seed_products()
 
 # =============================================================================
 # REST OF ROUTES (UNCHANGED; omitted here for brevity)
