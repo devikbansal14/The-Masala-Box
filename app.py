@@ -197,6 +197,7 @@ def seed_products():
         cursor.execute('''
             INSERT INTO products (name, subtitle, tagline, description, price, category, image_url, rating, reviews, allergy_info)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
         ''', (
             product['name'],
             product['subtitle'],
@@ -209,7 +210,7 @@ def seed_products():
             product['reviews'],
             product['allergy_info']
         ))
-        pid = cursor.fetchone()["id"] if cursor.description else None
+        pid = cursor.fetchone()["id"]
 
         for ingredient in product.get('ingredients', []):
             cursor.execute(
@@ -698,7 +699,11 @@ def signup():
     # Create user
     password_hash = generate_password_hash(password)
     cursor.execute(
-        'INSERT INTO users (name, email, phone, password_hash) VALUES (%s, %s, %s, %s)',
+        '''
+        INSERT INTO users (name, email, phone, password_hash)
+        VALUES (%s, %s, %s, %s)
+        RETURNING id
+        ''',
         (name, email, phone, password_hash)
     )
     user_id = cursor.fetchone()['id']
@@ -961,6 +966,7 @@ def add_address():
     cursor.execute('''
         INSERT INTO addresses (user_id, label, full_name, phone, address_line1, address_line2, city, state, pincode, is_default)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
     ''', (
         session['user_id'],
         data.get('label', 'Home'),
@@ -1049,10 +1055,15 @@ def delete_address(address_id):
 
     # If deleted address was default, make another one default
     if was_default:
-        cursor.execute(
-            'UPDATE addresses SET is_default = 1 WHERE user_id = %s ORDER BY created_at DESC LIMIT 1',
-            (session['user_id'],)
-        )
+        cursor.execute('''
+            UPDATE addresses SET is_default = 1
+            WHERE id = (
+                SELECT id FROM addresses
+                WHERE user_id = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            )
+        ''', (session['user_id'],))
 
     conn.commit()
     conn.close()
@@ -1171,6 +1182,7 @@ def create_order():
     cursor.execute('''
         INSERT INTO orders (order_number, user_id, address_id, subtotal, discount, delivery_fee, total_amount, promo_code)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
     ''', (order_number, session['user_id'], address_id, subtotal, discount, delivery_fee, total_amount, promo_code or None))
 
     order_id = cursor.fetchone()['id']
@@ -1511,8 +1523,12 @@ def admin_stats():
     total_orders = cursor.fetchone()['count']
 
     # Total revenue (only paid orders)
-    cursor.execute("SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE payment_status = 'paid'")
-    total_revenue = cursor.fetchone()['coalesce']
+    cursor.execute("""
+        SELECT COALESCE(SUM(total_amount), 0) AS total_revenue
+        FROM orders
+        WHERE payment_status = 'paid'
+    """)
+    total_revenue = cursor.fetchone()['total_revenue']
 
     # Total customers
     cursor.execute('SELECT COUNT(*) FROM users')
@@ -1637,12 +1653,3 @@ def admin_customers():
 # SERVER START
 # =============================================================================
 
-if __name__ == "__main__":
-    with app.app_context():
-        init_db()
-        seed_products()
-    app.run(
-        debug=FLASK_CONFIG['debug'],
-        host=FLASK_CONFIG['host'],
-        port=FLASK_CONFIG['port']
-    )
