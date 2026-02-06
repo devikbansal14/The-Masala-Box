@@ -1516,6 +1516,8 @@ function updateCartUI() {
 function createCartItem(item) {
     const weight = item.weight || '200g';
     const weightDisplay = item.category === 'single_origin' ? ` · ${weight}` : '';
+    // Use product_id if available, otherwise fall back to id
+    const productId = item.product_id || item.id;
     return `
         <div class="cart-item">
             <img src="${item.image_url}" alt="${item.name}" class="cart-item-image">
@@ -1524,10 +1526,10 @@ function createCartItem(item) {
                 <div class="cart-item-subtitle">${item.subtitle}${weightDisplay}</div>
                 <div class="cart-item-price">${formatPrice(item.price || 0)}</div>
                 <div class="cart-item-controls">
-                    <button class="qty-btn qty-decrease" data-product-id="${item.product_id}" data-weight="${weight}" aria-label="Decrease quantity">−</button>
+                    <button class="qty-btn qty-decrease" data-product-id="${productId}" data-weight="${weight}" aria-label="Decrease quantity">−</button>
                     <span class="qty-display">${item.quantity}</span>
-                    <button class="qty-btn qty-increase" data-product-id="${item.product_id}" data-weight="${weight}" aria-label="Increase quantity">+</button>
-                    <button class="remove-btn" data-product-id="${item.product_id}" data-weight="${weight}" aria-label="Remove item">
+                    <button class="qty-btn qty-increase" data-product-id="${productId}" data-weight="${weight}" aria-label="Increase quantity">+</button>
+                    <button class="remove-btn" data-product-id="${productId}" data-weight="${weight}" aria-label="Remove item">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7H15M8 10V14M12 10V14M6 7L7 17H13L14 7M9 4H11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                 </div>
